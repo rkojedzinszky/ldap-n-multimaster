@@ -1,0 +1,32 @@
+---
+- hosts: masters
+  gather_facts: no
+  user: root
+  tasks:
+  - name: determine serverID
+    set_fact:
+      serverID: '{{ play_hosts.index(inventory_hostname) + 1 }}'
+
+  - import_tasks: tasks/create-workdir.yml
+
+  - import_tasks: tasks/set-variables.yml
+
+  - import_tasks: tasks/generate-secret.yml
+
+  - import_tasks: tasks/deploy-files.yml
+
+  - name: setup stage1
+    shell: '{{ ldapmodify }} -f {{ ldif_stage_1 }}'
+
+  - name: ensure modules
+    include_tasks: tasks/ensure-module.yml
+    loop: '{{ olcModules }}'
+    loop_control:
+      loop_var: olcModuleName
+
+  - debug:
+      msg: '{{ serverID }} - temp: {{ workdir }} secret={{ secret }} secret_encrypted={{ secret_encrypted }}'
+
+  - import_tasks: tasks/cleanup.yml
+    tags:
+    - cleanup

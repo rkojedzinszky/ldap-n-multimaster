@@ -1,0 +1,8 @@
+---
+- name: create temp directory
+  tempfile:
+    state: directory
+  register: workdir
+
+- set_fact:
+    workdir: '{{ workdir.path }}'

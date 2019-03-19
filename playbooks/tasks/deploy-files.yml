@@ -1,0 +1,8 @@
+---
+- name: deploy files
+  template:
+    src: 'stage{{ item }}.ldif.j2'
+    dest: '{{ workdir }}/stage{{ item }}.ldif'
+  with_items:
+    - 1
+    - 2

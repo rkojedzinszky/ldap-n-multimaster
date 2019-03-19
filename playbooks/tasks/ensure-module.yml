@@ -1,0 +1,14 @@
+---
+- name: 'check if {{ olcModuleName }} is already loaded'
+  shell: "{{ ldapsearch }} -b cn=config '(&(objectClass=olcModuleList)(olcModuleLoad={{ olcModuleName }}))' olcModuleLoad | grep -q '^olcModuleLoad:.*{{ olcModuleName }}'"
+  register: module_check
+
+- name: 'generate ldif for {{ olcModuleName }}'
+  template:
+    src: module.ldif.j2
+    dest: '{{ ldif_module }}'
+  when: module_check.rc != 0
+
+- name: 'load module {{ olcModuleName }}'
+  shell: '{{ ldapmodify }} -f {{ ldif_module }}'
+  when: module_check.rc != 0

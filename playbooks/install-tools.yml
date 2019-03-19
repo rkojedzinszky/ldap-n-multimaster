@@ -1,0 +1,7 @@
+---
+- hosts: masters
+  user: root
+  tasks:
+  - name: install software
+    apt:
+      name: slapd,ldap-utils,ldapvi,less,vim
