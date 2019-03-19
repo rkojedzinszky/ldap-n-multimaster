@@ -1,2 +1,18 @@
-asd
+dn: cn=config
+changetype: modify
+replace: olcServerID
+{% for host in play_hosts %}
+olcServerID: {{ hostvars[host]['serverID'] }} {{ hostvars[host]['ldap_url'] }}
+{% endfor %}
 
+dn: olcDatabase={0}config,cn=config
+changetype: modify
+replace: olcSyncRepl
+{% for host in play_hosts %}
+olcSyncRepl: rid={{ 100 + hostvars[host]['serverID']|int }} provider={{ hostvars[host]['ldap_url'] }} binddn="cn=config" bindmethod=simple
+  credentials={{ hostvars[host]['secret'] }} searchbase="cn=config" type=refreshAndPersist
+  retry="5 5 300 5" timeout=1
+{% endfor %}
+-
+replace: olcMirrorMode
+olcMirrorMode: TRUE

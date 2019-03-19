@@ -1,0 +1,9 @@
+---
+- name: 'add {{ hostname }} to /etc/hosts'
+  lineinfile:
+    dest: /etc/hosts
+    regexp: ' {{ hostname }}'
+    line: '{{ hostvars[hostname]["ansible_default_ipv4"]["address"] }} {{ hostname }}'
+  loop: '{{ play_hosts }}'
+  loop_control:
+    loop_var: hostname

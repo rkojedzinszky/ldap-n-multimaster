@@ -1,11 +1,12 @@
 ---
 - hosts: masters
-  gather_facts: no
   user: root
   tasks:
   - name: determine serverID
     set_fact:
       serverID: '{{ play_hosts.index(inventory_hostname) + 1 }}'
+
+  - import_tasks: tasks/setup-etc-hosts.yml
 
   - import_tasks: tasks/create-workdir.yml
 
@@ -23,6 +24,20 @@
     loop: '{{ olcModules }}'
     loop_control:
       loop_var: olcModuleName
+
+  - name: restart slapd
+    service:
+      name: slapd
+      state: restarted
+
+  - name: add overlays
+    include_tasks: tasks/add-overlay-to-database.yml
+    loop: '{{ olcOverlays }}'
+    loop_control:
+      loop_var: olcOverlay
+
+  - name: setup sync of config database
+    import_tasks: tasks/config-db-sync.yml
 
   - debug:
       msg: '{{ serverID }} - temp: {{ workdir }} secret={{ secret }} secret_encrypted={{ secret_encrypted }}'
