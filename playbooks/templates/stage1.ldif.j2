@@ -3,7 +3,11 @@ changetype: modify
 replace: olcServerID
 olcServerID: {{ serverID }}
 
-dn: olcDatabase={0}config,cn=config
+dn: {{ configdb_dn }}
 changetype: modify
 replace: olcRootPW
 olcRootPW: {{ secret_encrypted }}
+{% if olcRootDN_exists.rc == 0 %}
+-
+delete: olcRootDN
+{% endif %}

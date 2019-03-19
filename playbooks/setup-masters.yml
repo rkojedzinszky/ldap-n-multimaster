@@ -12,6 +12,8 @@
 
   - import_tasks: tasks/set-variables.yml
 
+  - import_tasks: tasks/discover-ldap.yml
+
   - import_tasks: tasks/generate-secret.yml
 
   - import_tasks: tasks/deploy-files.yml
