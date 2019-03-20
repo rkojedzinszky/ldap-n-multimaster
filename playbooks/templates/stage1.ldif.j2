@@ -7,7 +7,7 @@ dn: {{ config_dn }}
 changetype: modify
 replace: olcRootPW
 olcRootPW: {{ secret_encrypted }}
-{% if olcRootDN_exists.rc == 0 %}
+{% if olcRootDN_exists %}
 -
 delete: olcRootDN
 {% endif %}

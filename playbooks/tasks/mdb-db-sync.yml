@@ -1,0 +1,39 @@
+---
+- name: determine mdb olcSuffix
+  shell: '{{ ldapsearch }} -b "{{ mdb_dn }}" "(objectClass=olcDatabaseConfig)" olcSuffix | sed -n -e "s/^olcSuffix: //"p'
+  register: mdb_olcSuffix
+
+- name: determine mdb olcRootDN
+  shell: '{{ ldapsearch }} -b "{{ mdb_dn }}" "(objectClass=olcDatabaseConfig)" olcRootDN | sed -n -e "s/^olcRootDN: //"p'
+  register: mdb_olcRootDN
+
+- name: generate new olcRootPW
+  shell: 'slappasswd -n -g'
+  register: mdb_olcRootPW
+
+- name: encrypt new olcRootPW
+  shell: 'slappasswd -s {{ mdb_olcRootPW.stdout_lines[0] }}'
+  register: mdb_olcRootPW_encrypted
+
+- name: parse mdb variables
+  set_fact:
+    mdb_olcSuffix: '{{ mdb_olcSuffix.stdout_lines[0] }}'
+    mdb_olcRootDN: '{{ mdb_olcRootDN.stdout_lines[0] }}'
+    mdb_olcRootPW: '{{ mdb_olcRootPW.stdout_lines[0] }}'
+    mdb_olcRootPW_encrypted: '{{ mdb_olcRootPW_encrypted.stdout_lines[0] }}'
+
+- name: generate ldif for mdb sync
+  template:
+    src: mdb-sync.ldif.j2
+    dest: '{{ ldif_mdb_sync }}'
+
+- name: enable mdb sync
+  shell: '{{ ldapmodify }} -f {{ ldif_mdb_sync }}'
+
+- name: enable mdb overlays
+  include_tasks: add-overlay-to-database.yml
+  vars:
+    olcDatabase: '{{ mdb_dn }}'
+  loop: '{{ olcOverlays }}'
+  loop_control:
+    loop_var: olcOverlay

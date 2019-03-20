@@ -5,6 +5,7 @@
     ldif_stage_2: '{{ workdir }}/stage2.ldif'
     ldif_module: '{{ workdir }}/module.ldif'
     ldif_overlay: '{{ workdir }}/overlay.ldif'
+    ldif_mdb_sync: '{{ workdir }}/mdb-sync.ldif'
     ldapsearch: 'ldapsearch -Y EXTERNAL -H ldapi:///'
     ldapmodify: 'ldapmodify -Y EXTERNAL -H ldapi:///'
     olcModules:

@@ -43,8 +43,13 @@
   - name: setup sync of config database
     import_tasks: tasks/config-db-sync.yml
 
+  - name: setup sync of mdb database
+    import_tasks: tasks/mdb-db-sync.yml
+    when: inventory_hostname == play_hosts[0]
+
   - debug:
-      msg: '{{ serverID }} - temp: {{ workdir }} secret={{ secret }} secret_encrypted={{ secret_encrypted }}'
+      msg: 'Manager: {{ mdb_olcRootDN }} Password: {{ mdb_olcRootPW }}'
+    when: inventory_hostname == play_hosts[0]
 
   - import_tasks: tasks/cleanup.yml
     tags:

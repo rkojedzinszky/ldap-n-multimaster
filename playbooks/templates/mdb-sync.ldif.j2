@@ -1,0 +1,14 @@
+dn: {{ mdb_dn }}
+changetype: modify
+replace: olcSyncRepl
+{% for host in play_hosts %}
+olcSyncRepl: rid={{ 200 + hostvars[host]['serverID']|int }} provider={{ hostvars[host]['ldap_url'] }} binddn="{{ mdb_olcRootDN }}" bindmethod=simple
+  credentials={{ mdb_olcRootPW }} searchbase="{{ mdb_olcSuffix }}" type=refreshOnly
+  interval=00:00:00:10 retry="5 5 300 5" timeout=1
+{% endfor %}
+-
+replace: olcMirrorMode
+olcMirrorMode: TRUE
+-
+replace: olcRootPW
+olcRootPW: {{ mdb_olcRootPW_encrypted }}

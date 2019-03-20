@@ -16,6 +16,9 @@
     mdb_dn: '{{ mdb_dn.stdout_lines[0] }}'
 
 - name: detect if olcRootDN is set for configdb
-  shell: '{{ ldapsearch }} -b cn=config "(&(objectClass=olcDatabaseConfig)(olcDatabase=config))" olcRootDN | grep -q ^olcRootDN'
+  shell: '{{ ldapsearch }} -b cn=config "(&(objectClass=olcDatabaseConfig)(olcDatabase=config))" olcRootDN | grep ^olcRootDN | wc -l'
   register: olcRootDN_exists
-  ignore_errors: yes
+
+- name: parse if olcRootDN is set for configdb
+  set_fact:
+    olcRootDN_exists: '{{ olcRootDN_exists.stdout_lines[0]|int > 0 }}'
