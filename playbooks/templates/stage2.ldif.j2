@@ -5,7 +5,7 @@ replace: olcServerID
 olcServerID: {{ hostvars[host]['serverID'] }} {{ hostvars[host]['ldap_url'] }}
 {% endfor %}
 
-dn: {{ configdb_dn }}
+dn: {{ config_dn }}
 changetype: modify
 replace: olcSyncRepl
 {% for host in play_hosts %}

@@ -34,6 +34,8 @@
 
   - name: add overlays
     include_tasks: tasks/add-overlay-to-database.yml
+    vars:
+      olcDatabase: '{{ config_dn }}'
     loop: '{{ olcOverlays }}'
     loop_control:
       loop_var: olcOverlay

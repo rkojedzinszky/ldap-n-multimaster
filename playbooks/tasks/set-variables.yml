@@ -8,7 +8,7 @@
     ldapsearch: 'ldapsearch -Y EXTERNAL -H ldapi:///'
     ldapmodify: 'ldapmodify -Y EXTERNAL -H ldapi:///'
     olcModules:
-    - syncprov.la
+    - syncprov
     olcModulePath: /usr/lib/ldap
     olcOverlays:
     - syncprov

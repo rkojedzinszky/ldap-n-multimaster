@@ -1,15 +1,15 @@
 ---
-- name: 'check if overlay {{ olcOverlay }} already exists'
-  shell: '{{ ldapsearch }} -b cn=config "(&(objectClass=olcOverlayConfig)(olcOverlay={{ olcOverlay }}))" olcOverlay | grep -q "^olcOverlay:.*{{ olcOverlay }}"'
+- name: 'check if overlay {{ olcOverlay }} already exists for {{ olcDatabase }}'
+  shell: '{{ ldapsearch }} -b "{{ olcDatabase }}" "(&(objectClass=olcOverlayConfig)(olcOverlay={{ olcOverlay }}))" olcOverlay | grep -q "^olcOverlay:.*{{ olcOverlay }}"'
   register: overlay_status
   ignore_errors: yes
 
-- name: 'generate ldif for loading overlay {{ olcOverlay }}'
+- name: 'generate ldif for loading overlay {{ olcOverlay }} for {{ olcDatabase }}'
   template:
     src: overlay.ldif.j2
     dest: '{{ ldif_overlay }}'
   when: overlay_status.rc != 0
 
-- name: 'add overlay {{ olcOverlay }}'
+- name: 'add overlay {{ olcOverlay }} to {{ olcDatabase }}'
   shell: '{{ ldapmodify }} -f {{ ldif_overlay }}'
   when: overlay_status.rc != 0

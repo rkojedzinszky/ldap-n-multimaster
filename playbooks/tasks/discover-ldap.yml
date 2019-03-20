@@ -1,0 +1,21 @@
+---
+- name: get config dn
+  shell: '{{ ldapsearch }} -b cn=config "(&(objectClass=olcDatabaseConfig)(olcDatabase=config))" dn | sed -n -e "s/^dn: //p"'
+  register: config_dn
+
+- name: parse config DN
+  set_fact:
+    config_dn: '{{ config_dn.stdout_lines[0] }}'
+
+- name: get mdb dn
+  shell: '{{ ldapsearch }} -b cn=config "(&(objectClass=olcDatabaseConfig)(olcDatabase=mdb))" dn | sed -n -e "s/^dn: //p"'
+  register: mdb_dn
+
+- name: parse mdb DN
+  set_fact:
+    mdb_dn: '{{ mdb_dn.stdout_lines[0] }}'
+
+- name: detect if olcRootDN is set for configdb
+  shell: '{{ ldapsearch }} -b cn=config "(&(objectClass=olcDatabaseConfig)(olcDatabase=config))" olcRootDN | grep -q ^olcRootDN'
+  register: olcRootDN_exists
+  ignore_errors: yes
